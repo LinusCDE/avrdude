@@ -87,6 +87,7 @@ AC_SUBST(LIBUSB_1_0, $LIBUSB_1_0)
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h])
 AC_CHECK_HEADERS([fcntl.h sys/ioctl.h sys/time.h termios.h unistd.h])
+AC_CHECK_HEADERS([wiringPi.h])
 AC_CHECK_HEADERS([ddk/hidsdi.h],,,[#include <windows.h>
 #include <setupapi.h>])
 

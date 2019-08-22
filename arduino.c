@@ -32,11 +32,18 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <wiringPi.h>
+
 #include "avrdude.h"
 #include "pgm.h"
 #include "stk500_private.h"
 #include "stk500.h"
 #include "serial.h"
+
+// Value obtained by $ gpio readall (value of wPi)
+// This value is neither the GPIO or BCM num!
+// DTR pulls to ground while we'll set it to 3v3. ACCOUNT FOR THAT!
+#define DTR_ALT_PIN 28
 
 /* read signature bytes - arduino version */
 static int arduino_read_sig_bytes(PROGRAMMER * pgm, AVRPART * p, AVRMEM * m)
@@ -92,10 +99,12 @@ static int arduino_open(PROGRAMMER * pgm, char * port)
 
   /* Clear DTR and RTS to unload the RESET capacitor 
    * (for example in Arduino) */
-  serial_set_dtr_rts(&pgm->fd, 0);
+  //serial_set_dtr_rts(&pgm->fd, 0);
+  digitalWrite(DTR_ALT_PIN, 0);
   usleep(50*1000);
   /* Set DTR and RTS back to high */
-  serial_set_dtr_rts(&pgm->fd, 1);
+  //serial_set_dtr_rts(&pgm->fd, 1);
+  digitalWrite(DTR_ALT_PIN, 1);
   usleep(50*1000);
 
   /*
@@ -111,7 +120,8 @@ static int arduino_open(PROGRAMMER * pgm, char * port)
 
 static void arduino_close(PROGRAMMER * pgm)
 {
-  serial_set_dtr_rts(&pgm->fd, 0);
+  //serial_set_dtr_rts(&pgm->fd, 0);
+  digitalWrite(DTR_ALT_PIN, 0);
   serial_close(&pgm->fd);
   pgm->fd.ifd = -1;
 }
@@ -128,4 +138,8 @@ void arduino_initpgm(PROGRAMMER * pgm)
   pgm->read_sig_bytes = arduino_read_sig_bytes;
   pgm->open = arduino_open;
   pgm->close = arduino_close;
+
+  wiringPiSetup();
+  pinMode(DTR_ALT_PIN, OUTPUT);
+  digitalWrite(DTR_ALT_PIN, 1); // DTR is true by default
 }

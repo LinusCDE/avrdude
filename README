@@ -1,3 +1,8 @@
+This fork is for use on the RPi to program arduino boards without USB.
+
+Since the internal UART doesn't have a DTR-Pin, this version Makes wPi-Pin 28 HIGH instead (GPIO 38).  
+This allows the use of an external circuit to this pin (HIGH signal needs to pull reset low) to program e.g. an Arduino Nano.
+
 See the documentation file for the details.
 
 The latest version of AVRDUDE is always available here:
